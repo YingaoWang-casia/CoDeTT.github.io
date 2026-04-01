@@ -81,20 +81,6 @@ python benchmark_ke_semantic.py \
 - `--datasets_user` / `--datasets_agent` 不传时，会使用脚本内默认路径。
 - `--history_rounds` 语义：`0=仅当前句`，`1=当前句+往上2句`，`2=当前句+往上4句`，`<0=全历史`。
 
-### 5) 标签过滤工具
-
-```bash
-python scripts/filter_test_hard_labels.py \
-  --input ./datasets/test_hard.jsonl \
-  --output ./datasets/test_hard.filtered.jsonl \
-  --keep 完整 不完整 附和 Dismissal \
-  --add-label-field
-```
-
-支持保留标签别名：
-- 中文：`完整` / `不完整` / `附和` / `Dismissal`
-- 英文：`completion` / `incomplete` / `backchannel` / `dismissal_speaking`
-
 ## 输出结果
 
 不同脚本输出目录略有差异，但通常包含：
@@ -109,7 +95,7 @@ python scripts/filter_test_hard_labels.py \
 2. 若出现 “No dataset files found”，优先检查脚本内默认数据路径或通过 CLI 传入数据集路径。
 3. 运行 API 相关脚本前，先确认模型服务地址、端口与鉴权配置可用。
 
-## 📚 引用 BibTeX
+## 📚 Citation
 
 如果你使用了本仓库或 CoDeTT 数据，建议引用论文：
 ```
