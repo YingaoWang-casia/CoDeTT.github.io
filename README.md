@@ -109,10 +109,10 @@ python scripts/filter_test_hard_labels.py \
 2. 若出现 “No dataset files found”，优先检查脚本内默认数据路径或通过 CLI 传入数据集路径。
 3. 运行 API 相关脚本前，先确认模型服务地址、端口与鉴权配置可用。
 
-## 引用 BibTeX
+## 📚 引用 BibTeX
 
 如果你使用了本仓库或 CoDeTT 数据，建议引用论文：
-
+```
 @misc{shen2026codettcontextawaredecisionbenchmark,
       title={CoDeTT: A Context-Aware Decision Benchmark for Turn-Taking Evaluation}, 
       author={Huan Shen and Yingao Wang and Shangkun Huang and Wei Zou and Yunzhang Chen},
@@ -122,4 +122,5 @@ python scripts/filter_test_hard_labels.py \
       primaryClass={cs.SD},
       url={https://arxiv.org/abs/2603.25434}, 
 }
+```
 
