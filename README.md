@@ -6,7 +6,7 @@
 
 面向全双工语音交互的上下文感知轮次决策评测基准。
 
-Context-aware turn-taking decision benchmark for full-duplex spoken dialogue systems.
+**中文** | [English](README_EN.md)
 
 <p>
   <a href="https://yingaowang-casia.github.io/CoDeTT.github.io/">
@@ -35,96 +35,86 @@ Context-aware turn-taking decision benchmark for full-duplex spoken dialogue sys
 
 ---
 
-## 🔥 Overview
+## 🔥 项目简介
 
-CoDeTT is a benchmark for evaluating **turn-taking decisions** in spoken dialogue systems. Instead of only asking whether a model detects the end of a user utterance, CoDeTT evaluates whether the system can make the right decision under different conversational contexts:
+CoDeTT 是一个用于评测语音对话系统 **turn-taking 决策能力** 的基准数据集与评测工具。传统 turn-taking 任务常被简化为“用户是否说完”的端点检测，而 CoDeTT 更关注真实全双工语音交互中的上下文决策：
 
-- Should the system **take over** and respond?
-- Should it **keep listening** because the user has not finished?
-- Should it **maintain** its current speech because the user only gave a backchannel?
-- Should it **stop and listen** because the user is interrupting or dismissing the current response?
+- 用户说完了吗，系统是否应该 **接管并回复**？
+- 用户还没说完，系统是否应该 **继续等待**？
+- 用户只是给出 backchannel，系统是否应该 **维持当前回复**？
+- 用户正在打断或否定系统，系统是否应该 **停止并倾听**？
 
-CoDeTT is designed for scenarios where voice agents need more than silence detection. It focuses on **context-aware decision making**, including user intent, system state, dialogue history, and interaction timing.
-
----
-
-## 📌 News
-
-- **2026-04-01**: arXiv v2 released.
-- **2026-03-26**: Paper submitted to arXiv.
-- Dataset and evaluation toolkit are available through this repository, Hugging Face, and ModelScope.
+CoDeTT 将 turn-taking 从静态端点判断扩展为结合用户意图、系统状态、对话历史和交互时机的结构化决策评测。
 
 ---
 
-## 📄 Paper, Dataset And Project Page
+## 📌 更新
 
-| Resource | Link |
+- **2026-04-01**：arXiv v2 发布。
+- **2026-03-26**：论文提交至 arXiv。
+- 数据集与评测代码已开放在 GitHub、Hugging Face 和 ModelScope。
+
+---
+
+## 📄 论文、数据集与项目页
+
+| 资源 | 链接 |
 | --- | --- |
-| 📄 Paper | [CoDeTT: A Context-Aware Decision Benchmark for Turn-Taking Evaluation](https://arxiv.org/abs/2603.25434) |
-| 📕 Local PDF | [`CoDeTT_benchmark/codett.pdf`](CoDeTT_benchmark/codett.pdf) |
-| 🌐 Project Page | [yingaowang-casia.github.io/CoDeTT.github.io](https://yingaowang-casia.github.io/CoDeTT.github.io/) |
-| 🤗 Hugging Face Dataset | [YingaoWang-casia/CoDeTT](https://huggingface.co/datasets/YingaoWang-casia/CoDeTT) |
-| 🔷 ModelScope Dataset | [wyawya/CoDeTT](https://www.modelscope.cn/datasets/wyawya/CoDeTT) |
+| 📄 论文 | [CoDeTT: A Context-Aware Decision Benchmark for Turn-Taking Evaluation](https://arxiv.org/abs/2603.25434) |
+| 📕 本地 PDF | [`CoDeTT_benchmark/codett.pdf`](CoDeTT_benchmark/codett.pdf) |
+| 🌐 项目页 | [yingaowang-casia.github.io/CoDeTT.github.io](https://yingaowang-casia.github.io/CoDeTT.github.io/) |
+| 🤗 Hugging Face 数据集 | [YingaoWang-casia/CoDeTT](https://huggingface.co/datasets/YingaoWang-casia/CoDeTT) |
+| 🔷 ModelScope 数据集 | [wyawya/CoDeTT](https://www.modelscope.cn/datasets/wyawya/CoDeTT) |
 
 ---
 
-## 🧠 What CoDeTT Evaluates
+## 🧠 CoDeTT 评测什么
 
-Traditional turn-taking evaluation is often reduced to binary endpoint detection: whether a user has finished speaking. CoDeTT reframes the problem as **structured decision making**.
+CoDeTT 将 turn-taking 建模为四类核心动作，并进一步分析 14 个细粒度语义意图场景。
 
-### 4-action decision space
+### 四类决策动作
 
-| Action | Meaning | Unified evaluation label in toolkit |
+| 动作 | 含义 | 工具中统一标签 |
 | --- | --- | --- |
-| `Takeover` | The system should take the conversational floor and respond. | `complete` |
-| `Dismiss` | The system should keep waiting or ignore the current input. | `incomplete` |
-| `Maintain` | The system should continue its current response. | `backchannel` |
-| `Stop & Listen` | The system should stop speaking and listen to the user. | `dismissal` |
+| `Takeover` | 系统应该接管话轮并进行回复。 | `complete` |
+| `Dismiss` | 系统应该继续等待，或忽略当前输入。 | `incomplete` |
+| `Maintain` | 系统应该继续当前回复。 | `backchannel` |
+| `Stop & Listen` | 系统应该停止说话并倾听用户。 | `dismissal` |
 
-### 14 fine-grained intent scenarios
+### 14 个细粒度意图场景
 
-CoDeTT further decomposes turn-taking behavior into fine-grained scenarios under two system states:
-
-| System state | Action group | Fine-grained intent |
+| 系统状态 | 动作组 | 细粒度意图 |
 | --- | --- | --- |
 | `SystemSpeaking` | `Maintain` | `Backchannel`, `Invalidation`, `SideTalk`, `Distraction` |
 | `SystemSpeaking` | `StopAndListen` | `Interruption`, `Dismissal`, `Collaboration` |
 | `SystemIdle` | `Takeover` | `Completion`, `Cooperation` |
 | `SystemIdle` | `Dismiss` | `Incomplete`, `Invalidation`, `Dismissal`, `Exclusion`, `SideTalk` |
 
-This design makes it possible to diagnose cases where a model gets the coarse action right but misunderstands the underlying intent.
+这种设计可以帮助分析模型到底是粗粒度动作判断错误，还是已经选对动作但误解了更细的语义意图。
 
 ---
 
-## 📊 Evaluation Protocol
+## 📊 评测协议
 
-CoDeTT supports two levels of evaluation:
+CoDeTT 支持两层评测：
 
-### Stage 1: Action-level evaluation
+### 阶段 1：动作级评测
 
-All models are evaluated under a unified 4-action / 4-label space:
+所有模型都会归一到四类标签空间：
 
 ```text
 complete | incomplete | backchannel | dismissal
 ```
 
-The toolkit reports overall accuracy, per-class accuracy, and binary-style metrics using `complete` as the positive class.
+评测脚本会输出整体准确率、各类别准确率，以及以 `complete` 为正类时的 precision、recall、F1、FPR 和 FNR 等指标。
 
-### Stage 2: Intent-level analysis
+### 阶段 2：意图级分析
 
-For models with stronger semantic reasoning capabilities, the benchmark can be extended to inspect the 14 fine-grained intent categories and analyze semantic misalignment.
-
-Typical metrics include:
-
-- `ACC`: action-level prediction accuracy
-- per-class accuracy: `complete`, `incomplete`, `backchannel`, `dismissal`
-- precision / recall / F1 for `complete`
-- false positive rate and false negative rate
-- per-source statistics for selected dismissal/wait cases
+对于具备更强语义理解能力的模型，可以进一步检查 14 个细粒度意图类别，用来分析模型在不同交互语境下的语义对齐情况。
 
 ---
 
-## 🖼️ Figures
+## 🖼️ 图示
 
 <p align="center">
   <img src="CoDeTT_benchmark/image/introduction.png" alt="CoDeTT introduction" width="85%" />
@@ -136,18 +126,19 @@ Typical metrics include:
 
 ---
 
-## 📦 Repository Structure
+## 📦 仓库结构
 
 ```text
 .
-├── index.html                              # Project page, not required for running benchmark
-├── README.md                               # This file
+├── index.html
+├── README.md
+├── README_EN.md
 └── CoDeTT_benchmark/
-    ├── benchmark.py                        # Main unified benchmark entry
-    ├── benchmark_qwen3.py                  # Qwen3-Omni API benchmark
-    ├── benchmark_minicpm.py                # MiniCPM local benchmark
-    ├── benchmark_ke_semantic.py            # KE-SemanticVAD benchmark
-    ├── codett.pdf                          # Paper PDF
+    ├── benchmark.py
+    ├── benchmark_qwen3.py
+    ├── benchmark_minicpm.py
+    ├── benchmark_ke_semantic.py
+    ├── codett.pdf
     ├── requirements.txt
     ├── image/
     │   ├── introduction.png
@@ -165,7 +156,7 @@ Typical metrics include:
 
 ---
 
-## 🛠️ Environment Setup
+## 🛠️ 环境配置
 
 ```bash
 git clone https://github.com/YingaoWang-casia/CoDeTT.github.io.git
@@ -176,7 +167,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-On Windows PowerShell:
+Windows PowerShell:
 
 ```powershell
 python -m venv .venv
@@ -184,22 +175,18 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-Notes:
-
-- Python 3.10+ is recommended.
-- Some model-specific scripts require additional local checkpoints or API services.
-- GPU memory requirements depend on the model being evaluated.
+建议使用 Python 3.10 或更高版本。不同模型脚本可能还需要本地 checkpoint、ONNX 文件或提前启动的本地 API 服务。
 
 ---
 
-## 📥 Dataset Preparation
+## 📥 数据准备
 
-Download the dataset from one of the official mirrors:
+请从官方镜像下载数据集：
 
 - Hugging Face: [YingaoWang-casia/CoDeTT](https://huggingface.co/datasets/YingaoWang-casia/CoDeTT)
 - ModelScope: [wyawya/CoDeTT](https://www.modelscope.cn/datasets/wyawya/CoDeTT)
 
-The benchmark scripts expect JSONL files grouped by language and scenario. The current scripts contain historical default paths such as:
+评测脚本默认读取按语言和场景划分的 JSONL 文件，历史默认路径类似：
 
 ```text
 Benchmark_Datasets/jsonls/ZH/syn/...
@@ -207,35 +194,29 @@ Benchmark_Datasets/jsonls/EN/syn/...
 Benchmark_Datasets/jsonls/EN/real/...
 ```
 
-Before running on a new machine, update the default dataset paths in the corresponding script, or pass explicit paths when the script supports CLI overrides.
+在新机器上运行前，请根据本地数据位置修改脚本中的默认路径，或在支持命令行参数的脚本中显式传入数据路径。
 
 ---
 
-## 🚀 Quick Start
+## 🚀 快速开始
 
-### 1. Unified benchmark
+### 1. 统一评测入口
 
 ```bash
 cd CoDeTT_benchmark
 python benchmark.py --out_dir ./outputs --run_name exp1
 ```
 
-`benchmark.py` evaluates supported turn-taking models through a shared protocol. It uses:
+`benchmark.py` 会通过统一协议评测不同 turn-taking 模型。运行前请检查 `DEFAULT_DATASETS_ZH`、`DEFAULT_DATASETS_EN` 和 `build_default_paths()` 中的数据与模型路径。
 
-- `DEFAULT_DATASETS_ZH`
-- `DEFAULT_DATASETS_EN`
-- `build_default_paths()`
-
-Please edit these paths if your dataset or model checkpoints are stored elsewhere.
-
-### 2. Qwen3-Omni benchmark
+### 2. Qwen3-Omni
 
 ```bash
 cd CoDeTT_benchmark
 python benchmark_qwen3.py
 ```
 
-The script calls an OpenAI-compatible local API endpoint. Useful environment variables:
+该脚本调用 OpenAI-compatible 的本地 API 服务。常用环境变量如下：
 
 ```bash
 export QWEN_API_URL="http://localhost:8000/v1/chat/completions"
@@ -243,7 +224,7 @@ export QWEN_TIMEOUT=120
 export SEND_MODEL_FIELD=0
 ```
 
-On Windows PowerShell:
+Windows PowerShell:
 
 ```powershell
 $env:QWEN_API_URL="http://localhost:8000/v1/chat/completions"
@@ -252,16 +233,16 @@ $env:SEND_MODEL_FIELD="0"
 python benchmark_qwen3.py
 ```
 
-### 3. MiniCPM benchmark
+### 3. MiniCPM
 
 ```bash
 cd CoDeTT_benchmark
 python benchmark_minicpm.py
 ```
 
-Before running, set `LOCAL_MODEL_DIR` in `benchmark_minicpm.py` to your local MiniCPM checkpoint directory.
+运行前请在 `benchmark_minicpm.py` 中设置 `LOCAL_MODEL_DIR` 为本地 MiniCPM checkpoint 路径。
 
-### 4. KE-SemanticVAD benchmark
+### 4. KE-SemanticVAD
 
 ```bash
 cd CoDeTT_benchmark
@@ -272,22 +253,20 @@ python benchmark_ke_semantic.py \
   --datasets_agent /path/to/agent_1.jsonl /path/to/agent_2.jsonl
 ```
 
-`history_rounds` controls how much dialogue context is preserved:
+`history_rounds` 控制保留多少轮上下文：
 
-| Value | Meaning |
+| 取值 | 含义 |
 | --- | --- |
-| `0` | current utterance only |
-| `1` | current utterance + previous 2 messages |
-| `2` | current utterance + previous 4 messages |
-| `<0` | full history |
+| `0` | 仅当前话语 |
+| `1` | 当前话语 + 前 2 条消息 |
+| `2` | 当前话语 + 前 4 条消息 |
+| `<0` | 使用完整历史 |
 
 ---
 
-## 🧪 Supported Baselines And Adapters
+## 🧪 支持的基线与适配器
 
-The unified benchmark includes adapters for several turn-taking models:
-
-| Adapter | Input / paradigm | Output space |
+| 适配器 | 输入 / 范式 | 输出空间 |
 | --- | --- | --- |
 | `EasyTurnWP` | audio | `complete`, `incomplete`, `backchannel`, `dismissal` |
 | `SmartTurnWP` | audio / ONNX | binary `complete`, `incomplete` |
@@ -298,13 +277,13 @@ The unified benchmark includes adapters for several turn-taking models:
 | `Qwen3-Omni` | multimodal API | 4-label evaluation |
 | `MiniCPM` | local multimodal model | 4-label evaluation |
 
-Binary models are evaluated on the supported subset or through compatible mapping logic in the toolkit.
+二分类模型会在工具支持的子集上评测，或通过适配器中的映射逻辑转换到统一标签空间。
 
 ---
 
-## 📁 Outputs
+## 📁 输出结果
 
-Output directories vary by script, but typically include:
+不同脚本的输出目录略有差异，通常包含：
 
 ```text
 config.json
@@ -314,31 +293,29 @@ per_sample*.jsonl
 error_samples.jsonl
 ```
 
-Common output meanings:
-
-| File | Meaning |
+| 文件 | 含义 |
 | --- | --- |
-| `config.json` | run configuration, dataset paths, model paths |
-| `results.json` | aggregate metrics in JSON |
-| `report.md` | human-readable Markdown report |
-| `per_sample*.jsonl` | per-sample prediction logs |
-| `error_samples.jsonl` | failed or malformed samples, if generated |
+| `config.json` | 本次运行配置、数据路径与模型路径 |
+| `results.json` | 聚合指标 |
+| `report.md` | 方便阅读的 Markdown 报告 |
+| `per_sample*.jsonl` | 每条样本的预测记录 |
+| `error_samples.jsonl` | 失败或格式异常样本 |
 
 ---
 
-## ⚠️ Common Notes
+## ⚠️ 注意事项
 
-1. Some default paths are historical local paths and need to be changed on a new machine.
-2. If you see `No dataset files found`, check `DEFAULT_DATASETS_*` or pass dataset paths explicitly.
-3. API-based scripts require the local model service to be running before evaluation.
-4. Local multimodal model scripts may need large GPU memory; reduce concurrency if OOM occurs.
-5. `dismissal` in this toolkit also covers wait / stop-and-listen style cases after normalization.
+1. 部分默认路径来自历史实验环境，在新机器上需要手动修改。
+2. 如果出现 `No dataset files found`，请检查 `DEFAULT_DATASETS_*` 或显式传入数据路径。
+3. API 模型脚本需要先启动本地模型服务。
+4. 本地多模态模型可能需要较大显存，显存不足时请降低并发或改用更小模型。
+5. 工具中的 `dismissal` 也覆盖归一化后的等待、停止并倾听等情况。
 
 ---
 
-## 📚 Citation
+## 📚 引用
 
-If you use CoDeTT or reference its benchmark design, please cite:
+如果你使用 CoDeTT 数据集、评测脚本或相关 benchmark 设计，请引用：
 
 ```bibtex
 @misc{shen2026codettcontextawaredecisionbenchmark,
@@ -354,6 +331,6 @@ If you use CoDeTT or reference its benchmark design, please cite:
 
 ---
 
-## 📬 Contact
+## 📬 联系
 
-For questions about the dataset, benchmark scripts, or paper, please open an issue in this repository or contact the authors through the project page.
+如有关于数据集、评测脚本或论文的问题，欢迎在本仓库提交 issue，或通过项目页联系作者。
